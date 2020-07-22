@@ -10,11 +10,16 @@
 
 void leave_game();
 void main_menu();
+
 void best_score_guesses(std::vector<int>);
 void print_guesses(std::vector<int>);
 void play_guessing_game();
 
 char draw_color();
+long double bet_casino(long double);
+char player_color_casiono();
+void counter_casino();
+long double verdict_casino(char,char,long double,long double);
 void play_casino_game();
 
 int main()
@@ -87,10 +92,10 @@ void main_menu()
 
 void best_score_guesses(std::vector<int> data)
 {
-	std::ifstream guess_input("Guesses_best_score.txt");
+	std::ifstream guess_input("D:/Programowanie/GitHub/Simple games/Simple games/Guessing_game/Guesses_best_score.txt");
 	int best_score;
 	guess_input >> best_score;
-	std::ofstream guess_output("Guesses_best_score.txt");
+	std::ofstream guess_output("D:/Programowanie/GitHub/Simple games/Simple games/Guessing_game/Guesses_best_score.txt");
 	std::cout << "You won in " << data.size() << " moves." << std::endl;
 	if (data.size() < best_score)
 	{
@@ -171,31 +176,10 @@ char draw_color()
 	return color;
 }
 
-void play_casino_game()
+long double bet_casino(long double balans)
 {
-	system("cls");
-	char correct_color;
-	char player_color;
-	correct_color = draw_color();
-
-	std::string player_name;
-	std::cout << "Enter your name: ";
-	std::cin >> player_name;
-	std::string player_surname;
-	std::cout << "Enter your surname: ";
-	std::cin >> player_surname;
-	std::string file_name = player_name + player_surname;
-	std::fstream save(file_name + ".txt");
-
-	long double balans = 100;
-	save >> balans;
-
-	system("cls");
-	std::cout << "Hello " << player_name << " " << player_surname << ", You have " << balans << " credits." << std::endl;
-
 	long double bet;
-
-	do
+	while (true)
 	{
 		std::cout << "Enter an amout of credits to bet: ";
 		std::cin >> bet;
@@ -211,48 +195,100 @@ void play_casino_game()
 			system("PAUSE");
 			system("cls");
 		}
-	} while (bet > balans || bet <= 0);
+		else
+		{
+			return bet;
+		}
+	}
+}
 
-	do
+char player_color_casiono()
+{
+	char player_color;
+	while (true)
 	{
 		std::cout << "Pick the color (R|G|B): ";
 		std::cin >> player_color;
-		std::toupper(player_color);//NIE DZIA£A
+		player_color = std::toupper(player_color);
 		if (player_color != 'R' && player_color != 'G' && player_color != 'B')
 		{
 			std::cout << "This character is incorrect!" << std::endl;
 			system("PAUSE");
 			system("cls");
 		}
+		else
+		{
+			system("cls");
+			return player_color;
+		}
+	}
+}
 
-	} while (player_color != 'R' && player_color != 'G' && player_color != 'B');
-
-	system("cls");
-
+void counter_casino()
+{
 	for (int i = 5; i >= 0; i--)
 	{
 		std::cout << i;
 		Sleep(1000);
 		system("cls");
 	}
+}
 
-	if (player_color = correct_color && correct_color == 'G')
+long double verdict_casino(char correct_color, char player_color, long double balans, long double bet)
+{
+	if (player_color == correct_color)
 	{
-		std::cout << "Gratulacje You won " << 14 * bet << " credits" << std::endl;
-		balans += 13 * bet;
-	}
-	else if (player_color = correct_color && (correct_color == 'B' || correct_color == 'R'))
-	{
-		std::cout << "Gratulacje You won " << 2 * bet << " credits" << std::endl;
-		balans += bet;
+		if (player_color == 'R' || player_color == 'B')
+		{
+			std::cout << "Congratulations You won " << 2 * bet << " credits" << std::endl;
+			balans += 2 * bet;
+		}
+		else if (player_color == 'G')
+		{
+			std::cout << "Congratulations You won " << 14 * bet << " credits" << std::endl;
+			balans += 14 * bet;
+		}
 	}
 	else
 	{
-		std::cout << "Niestety You lost " << bet << " credits" << std::endl;
+		std::cout << "Unfortunately You lost " << bet << " credits" << std::endl;
 		std::cout << "The correct color was " << correct_color << std::endl;
-		balans -= bet;
 	}
-	save << balans;
+	std::cout << "Your current balans: " << balans << std::endl;
+	return balans;
+}
+
+void play_casino_game()
+{
+	system("cls");
+	char correct_color;
+	correct_color = draw_color();
+
+	std::string player_name;
+	std::cout << "Enter your name: ";
+	std::cin >> player_name;
+	std::string player_surname;
+	std::cout << "Enter your surname: ";
+	std::cin >> player_surname;
+	std::string file_name = player_name + player_surname;
+	std::cout << file_name;
+	std::ifstream save_input("D:/Programowanie/GitHub/Simple games/Simple games/Casino_game/" + file_name + ".txt");
+	long double balans = 100;
+	save_input >> balans;
+	system("cls");
+	std::cout << "Hello " << player_name << " " << player_surname << ", You have " << balans << " credits." << std::endl;
+
+	long double bet = bet_casino(balans);
+	balans -= bet;
+
+	char player_color = player_color_casiono();
+
+	counter_casino();
+
+	balans=verdict_casino(correct_color, player_color, balans, bet);
+
+	std::ofstream save_output("D:/Programowanie/GitHub/Simple games/Simple games/Casino_game/" + file_name + ".txt");
+	save_output << balans;
 	system("PAUSE");
 	system("cls");
 }
